@@ -1,0 +1,55 @@
+.header {
+   display: flex;
+   align-items: center;
+   flex-direction: column;
+}
+
+.header h1 {
+   font-size: 48px;
+}
+
+.custom-input {
+   position: relative;
+}
+
+.custom-input input {
+   padding-right: 30px;
+   width: 45vw;
+   padding: 10px 5px;
+   font-size: 16px;
+}
+
+.custom-input svg {
+   position: absolute;
+   top: 50%;
+   right: 10px;
+   transform: translateY(-50%);
+   width: 20px;
+   height: auto;
+   cursor: pointer;
+}
+
+.selects {
+   display: flex;
+   align-items: center;
+   gap: 80px;
+}
+
+.categories,
+.sorted {
+   display: flex;
+   align-items: center;
+   gap: 10px;
+   padding-top: 20px;
+}
+
+.categories select,
+.sorted select {
+   padding: 5px;
+   font-size: 12px;
+}
+
+.categories p,
+.sorted p {
+   font-size: 16px;
+}

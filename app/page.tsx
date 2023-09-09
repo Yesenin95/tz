@@ -1,113 +1,120 @@
-import Image from 'next/image'
+'use client'
+import React, { useEffect, useState } from 'react';
+import { BiSearch } from 'react-icons/bi';
+import axios from 'axios';
+import BookCardList from '../components/BookCardList';
+import style from '../styles/home.module.css';
 
 export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+   const [selectedCategory, setSelectedCategory] = useState('all');
+   const [selectedSort, setSelectedSort] = useState('relevance');
+   const [searchQuery, setSearchQuery] = useState('');
+   const [searchResults, setSearchResults] = useState([]);
+   const [visibleBooks, setVisibleBooks] = useState(30);
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+   /**
+    * Этот код представляет собой компонент TypeScript React, который обрабатывает вводимые пользователем
+    * данные для категорий, сортировки и поисковых запросов, извлекает данные из API Google Книг на основе
+    * вводимых пользователем данных и соответствующим образом обновляет результаты поиска. Он также
+    * реализует бесконечную прокрутку для загрузки большего количества книг по мере того, как пользователь
+    * прокручивает страницу вниз.
+    * @param e - Параметр `e` — это объект события, который передается функциям обработчика событий. Он
+    * содержит информацию о произошедшем событии, например целевой элемент и его значение.
+    */
+   const handleCategoryChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
+      setSelectedCategory(e.target.value);
+   };
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+   const handleSortChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
+      setSelectedSort(e.target.value);
+   };
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
+   const handleSearchQueryChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
+      setSearchQuery(e.target.value);
+   };
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
+   const fetchData = async () => {
+      try {
+         const response = await axios.get('https://www.googleapis.com/books/v1/volumes', {
+            params: {
+               q: searchQuery,
+               subject: selectedCategory === 'all' ? '' : `subject:${selectedCategory}`,
+               orderBy: selectedSort,
+               maxResults: 30, // Устанавливаем желаемое количество результатов
+               key: 'AIzaSyBBzqfqfxLvryo-iGJA10yuWnz1BaDRqtw',
+            },
+         });
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+         const books = response.data.items || [];
+         setSearchResults(books);
+      } catch (error) {
+         console.error('Произошла ошибка:', error);
+      }
+   };
+
+
+   useEffect(() => {
+      if (searchQuery) {
+         fetchData();
+      }
+   }, [searchQuery, selectedCategory, selectedSort]);
+
+   const handleScroll = () => {
+      if (
+         window.innerHeight + document.documentElement.scrollTop >=
+         document.documentElement.offsetHeight - 200
+      ) {
+         setVisibleBooks((prevVisibleBooks) => prevVisibleBooks + 4);
+      }
+   };
+
+   useEffect(() => {
+      fetchData();
+   }, [selectedCategory]);
+   const handleKeyDown = (e: { key: string; }) => {
+      if (e.key === 'Enter') {
+         fetchData();
+      }
+   };
+
+   return (
+      <main className={style.main}>
+         <section className={style.header}>
+            <h1>Поиск книги</h1>
+            <div className={style['custom-input']}>
+               <input
+                  type="text"
+                  placeholder="Введите текст"
+                  value={searchQuery}
+                  onChange={handleSearchQueryChange}
+                  onKeyDown={handleKeyDown}
+               />
+               <BiSearch onClick={fetchData} />
+            </div>
+            <section className={style.selects}>
+               <div className={style.categories}>
+                  <p>Категории</p>
+                  <select value={selectedCategory} onChange={handleCategoryChange}>
+                     <option value="all">Все категории</option>
+                     <option value="art">Искусство</option>
+                     <option value="biography">Биография</option>
+                     <option value="computers">Компьютеры</option>
+                     <option value="history">История</option>
+                     <option value="medical">Медицина</option>
+                     <option value="poetry">Поэзия</option>
+                  </select>
+               </div>
+               <div className={style.sorted}>
+                  <p>Сортировка по</p>
+                  <select value={selectedSort} onChange={handleSortChange}>
+                     <option value="relevance">По релевантности</option>
+                     <option value="newest">Сначала новые</option>
+                  </select>
+               </div>
+            </section>
+         </section>
+
+         <BookCardList books={searchResults.slice(0, visibleBooks)} />
+      </main>
+   );
 }

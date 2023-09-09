@@ -1,0 +1,45 @@
+.cards {
+   display: grid;
+   grid-template-columns: 1fr 1fr 1fr 1fr;
+   grid-gap: 15px;
+   padding: 0 20px;
+   padding-bottom: 20px;
+}
+
+.card {
+   width: 250px;
+   height: 430px;
+   background: #c5b867;
+   display: flex;
+   flex-direction: column;
+   justify-content: space-around;
+   word-wrap: break-word;
+   align-items: center;
+}
+
+.card img {
+   width: 50%;
+   height: auto;
+}
+
+.card h2 {
+   font-size: 14px;
+   width: 90%;
+   height: 30px;
+   text-wrap: balance;
+   align-items: center;
+   justify-content: center;
+   padding-bottom: 50px;
+}
+
+.card p {
+   color: aliceblue;
+   text-decoration: underline;
+   width: 90%;
+   margin: 0 auto;
+}
+
+.card h3 {
+   font-size: 14px;
+   width: 100%;
+}

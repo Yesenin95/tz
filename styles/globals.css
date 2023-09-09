@@ -1,0 +1,11 @@
+body,
+html {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background-image: url('../public/fon.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      /* Это фиксирует фон, чтобы он не прокручивался вместе со страницей */
+}
