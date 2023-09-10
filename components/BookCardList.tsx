@@ -3,7 +3,15 @@ import style from '../styles/card.module.css';
 
 
 
-// Компонент для отображения одной карточки книги
+
+/**
+ * Компонент BookCard отображает карточку, отображающую информацию о книге, включая ее обложку,
+ * название, категорию и авторов.
+ * @param {any}  - Компонент BookCard принимает один параметр под названием «book». Этот параметр
+ * представляет собой объект, представляющий книгу. Объект должен иметь свойство VolumeInfo, которое
+ * содержит информацию о книге, такую как ее название, категории, авторы и ссылки на изображения.
+ * @returns элемент JSX, представляющий карточку, отображающую информацию о книге.
+ */
 function BookCard({ book }:any) {
    return (
       <div className={style.card}>
@@ -16,8 +24,10 @@ function BookCard({ book }:any) {
       </div>
    );
 }
+/* Интерфейс BookCardListProps определяет реквизиты, которые можно передать компоненту BookCardList. Он
+определяет следующие реквизиты: */
 interface BookCardListProps {
-   books: any[]; // You can specify a more specific type for books if needed
+   books: any[]; 
    isLoading: boolean;
    allBooksLoaded: boolean;
    onLoadMoreClick: () => void;
@@ -25,9 +35,6 @@ interface BookCardListProps {
 // Компонент для отображения списка карточек книг
 export default function BookCardList({
    books,
-   isLoading,
-   allBooksLoaded,
-   onLoadMoreClick,
 }: BookCardListProps) {
    return (
       <div>
@@ -43,6 +50,15 @@ export default function BookCardList({
    );
 }
 
+/**
+ * Функция renderAuthors принимает входные данныеauthors и возвращает элемент JSX, который отображает
+ * имена авторов, при этом отображается максимум два имени и указывается, есть ли еще авторы. Если ввод
+ * `авторы` не предоставлен, отображается сообщение о том, что автор не указан.
+ * @param {any} authors - Параметр `authors` имеет тип `any`, что означает, что он может иметь любой
+ * тип данных. Это может быть одно имя автора в виде строки, массив имен авторов или оно может быть
+ * нулевым или неопределенным, если автор не указан.
+ * @returns Функция renderAuthors возвращает элемент JSX.
+ */
 function renderAuthors(authors: any) {
    if (!authors) {
       return <p>Автор не указан</p>;

@@ -14,18 +14,40 @@ export default function Home() {
    const [allBooksLoaded, setAllBooksLoaded] = useState(false);
    const [currentPage, setCurrentPage] = useState(1);
 
+  /**
+   * Функция handleCategoryChange обновляет выбранную категорию на основе значения целевого элемента.
+   * @param e - Параметр e — это объект события, который представляет событие, вызвавшее изменение. В
+   * данном случае это объект, содержащий информацию о событии, например целевой элемент, вызвавший
+   * событие.
+   */
    const handleCategoryChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
       setSelectedCategory(e.target.value);
    };
 
+   /**
+    * Функция handleSortChange обновляет выбранное значение сортировки на основе значения, выбранного в
+    * раскрывающемся меню.
+    * @param e - Параметр e — это объект события, который представляет событие, вызвавшее изменение. В
+    * данном случае это объект, имеющий свойство target. Свойство target — это объект, имеющий свойство
+    * value.
+    */
    const handleSortChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
       setSelectedSort(e.target.value);
    };
 
+ /**
+  * Функция handleSearchQueryChange обновляет переменную состояния searchQuery значением поля ввода.
+  * @param e - Параметр e — это объект события, который представляет событие, вызвавшее изменение
+  * поискового запроса.
+  */
    const handleSearchQueryChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
       setSearchQuery(e.target.value);
    };
 
+/**
+ * Функция handleLoadMoreClick используется для загрузки следующей страницы книги при нажатии кнопки
+ * «Загрузить больше».
+ */
    const handleLoadMoreClick = () => {
       const nextPage = currentPage + 1;
       setCurrentPage(nextPage);
@@ -34,6 +56,14 @@ export default function Home() {
       fetchData(nextPage);
    };
 
+ /**
+  * Функция fetchData — это асинхронная функция, которая извлекает данные из API Google Книг на основе
+  * предоставленного поискового запроса, выбранной категории и выбранного параметра сортировки и
+  * соответствующим образом обновляет состояние результатов поиска.
+  * @param {number} page - Параметр page представляет текущий номер страницы результатов поиска. Он
+  * используется для расчета начального индекса получения книг из API. Начальный индекс рассчитывается
+  * как `(страница – 1) * 30`, где 30 – максимальное количество книг, извлекаемых за один раз.
+  */
    const fetchData = async (page: number) => {
       setIsLoading(true);
 
@@ -69,6 +99,9 @@ export default function Home() {
       }
    };
 
+   /* Хук useEffect используется для выполнения побочных эффектов в функциональном компоненте. В этом
+   случае перехват useEffect используется для сброса результатов поиска и получения первой партии
+   книг при изменении поискового запроса, выбранной категории или выбранной сортировки. */
    useEffect(() => {
       setSearchResults([]); // Сбрасываем результаты поиска при изменении поискового запроса
       if (searchQuery) {
@@ -76,6 +109,8 @@ export default function Home() {
       }
    }, [searchQuery, selectedCategory, selectedSort]);
 
+/* Хук useEffect используется для выполнения побочных эффектов в функциональном компоненте. В этом
+случае перехват useEffect используется для извлечения книг при изменении состояния currentPage. */
    useEffect(() => {
       fetchData(currentPage); // Загружаем книги при изменении текущей страницы
    }, [currentPage]);
