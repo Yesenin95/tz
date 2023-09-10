@@ -10,17 +10,10 @@ export default function Home() {
    const [selectedSort, setSelectedSort] = useState('relevance');
    const [searchQuery, setSearchQuery] = useState('');
    const [searchResults, setSearchResults] = useState([]);
-   const [visibleBooks, setVisibleBooks] = useState(30);
+   const [isLoading, setIsLoading] = useState(false);
+   const [allBooksLoaded, setAllBooksLoaded] = useState(false);
+   const [currentPage, setCurrentPage] = useState(1);
 
-   /**
-    * Этот код представляет собой компонент TypeScript React, который обрабатывает вводимые пользователем
-    * данные для категорий, сортировки и поисковых запросов, извлекает данные из API Google Книг на основе
-    * вводимых пользователем данных и соответствующим образом обновляет результаты поиска. Он также
-    * реализует бесконечную прокрутку для загрузки большего количества книг по мере того, как пользователь
-    * прокручивает страницу вниз.
-    * @param e - Параметр `e` — это объект события, который передается функциям обработчика событий. Он
-    * содержит информацию о произошедшем событии, например целевой элемент и его значение.
-    */
    const handleCategoryChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
       setSelectedCategory(e.target.value);
    };
@@ -33,49 +26,59 @@ export default function Home() {
       setSearchQuery(e.target.value);
    };
 
-   const fetchData = async () => {
+   const handleLoadMoreClick = () => {
+      const nextPage = currentPage + 1;
+      setCurrentPage(nextPage);
+
+      // При клике на "Загрузить ещё" загружаем следующую порцию книг
+      fetchData(nextPage);
+   };
+
+   const fetchData = async (page: number) => {
+      setIsLoading(true);
+
       try {
          const response = await axios.get('https://www.googleapis.com/books/v1/volumes', {
             params: {
                q: searchQuery,
                subject: selectedCategory === 'all' ? '' : `subject:${selectedCategory}`,
                orderBy: selectedSort,
-               maxResults: 30, // Устанавливаем желаемое количество результатов
+               maxResults: 30, // Всегда загружаем максимум 30 книг
+               startIndex: (page) * 30, // Вычисляем начальный индекс страницы
                key: 'AIzaSyBBzqfqfxLvryo-iGJA10yuWnz1BaDRqtw',
             },
          });
 
          const books = response.data.items || [];
-         setSearchResults(books);
+
+         // Если получено меньше книг, чем ожидалось, считаем, что книги закончились
+         if (books.length < 30) {
+            setAllBooksLoaded(true);
+         }
+
+         // Если текущая страница больше 1, добавляем книги к уже загруженным
+         if (page > 1) {
+            setSearchResults((prevResults): any => [...prevResults, ...books]);
+         } else {
+            setSearchResults(books);
+         }
       } catch (error) {
          console.error('Произошла ошибка:', error);
+      } finally {
+         setIsLoading(false);
       }
    };
 
-
    useEffect(() => {
+      setSearchResults([]); // Сбрасываем результаты поиска при изменении поискового запроса
       if (searchQuery) {
-         fetchData();
+         fetchData(1); // Загружаем первую порцию книг при новом поисковом запросе
       }
    }, [searchQuery, selectedCategory, selectedSort]);
 
-   const handleScroll = () => {
-      if (
-         window.innerHeight + document.documentElement.scrollTop >=
-         document.documentElement.offsetHeight - 200
-      ) {
-         setVisibleBooks((prevVisibleBooks) => prevVisibleBooks + 4);
-      }
-   };
-
    useEffect(() => {
-      fetchData();
-   }, [selectedCategory]);
-   const handleKeyDown = (e: { key: string; }) => {
-      if (e.key === 'Enter') {
-         fetchData();
-      }
-   };
+      fetchData(currentPage); // Загружаем книги при изменении текущей страницы
+   }, [currentPage]);
 
    return (
       <main className={style.main}>
@@ -87,9 +90,8 @@ export default function Home() {
                   placeholder="Введите текст"
                   value={searchQuery}
                   onChange={handleSearchQueryChange}
-                  onKeyDown={handleKeyDown}
                />
-               <BiSearch onClick={fetchData} />
+               <BiSearch onClick={() => fetchData(1)} />
             </div>
             <section className={style.selects}>
                <div className={style.categories}>
@@ -114,7 +116,14 @@ export default function Home() {
             </section>
          </section>
 
-         <BookCardList books={searchResults.slice(0, visibleBooks)} />
+         <BookCardList books={searchResults} isLoading={isLoading} allBooksLoaded={allBooksLoaded} onLoadMoreClick={handleLoadMoreClick} />
+         {!allBooksLoaded && (
+            <div className={style.loadMoreButton}>
+               <button onClick={handleLoadMoreClick} disabled={isLoading}>
+                  {isLoading ? 'Загрузка...' : 'Загрузить ещё'}
+               </button>
+            </div>
+         )}
       </main>
    );
 }

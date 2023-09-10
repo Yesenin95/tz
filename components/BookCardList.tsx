@@ -1,7 +1,10 @@
 import React from 'react';
 import style from '../styles/card.module.css';
+
+
+
 // Компонент для отображения одной карточки книги
-function BookCard({ book }) {
+function BookCard({ book }:any) {
    return (
       <div className={style.card}>
          <img src={book.volumeInfo.imageLinks?.thumbnail} alt={book.volumeInfo.title} />
@@ -13,22 +16,34 @@ function BookCard({ book }) {
       </div>
    );
 }
-
+interface BookCardListProps {
+   books: any[]; // You can specify a more specific type for books if needed
+   isLoading: boolean;
+   allBooksLoaded: boolean;
+   onLoadMoreClick: () => void;
+}
 // Компонент для отображения списка карточек книг
-export default function BookCardList({ books, }) {
-   return <>
-      <p>Найдено книг: {books.length}</p>
-      <div className={style.cards}>
-         {books.map((book, index) => (
-            <BookCard key={index} book={book} />
-         ))}
+export default function BookCardList({
+   books,
+   isLoading,
+   allBooksLoaded,
+   onLoadMoreClick,
+}: BookCardListProps) {
+   return (
+      <div>
+         <p>Найдено книг: {books.length}</p>
+         <div className={style.cards}>
+            {books.map((book, index) => (
+               <BookCard key={index} book={book} />
+
+            ))}
+         </div>
+
       </div>
-   </>;
+   );
 }
 
-
-
-function renderAuthors(authors) {
+function renderAuthors(authors: any) {
    if (!authors) {
       return <p>Автор не указан</p>;
    }
